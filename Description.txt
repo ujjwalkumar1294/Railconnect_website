@@ -1,0 +1,16 @@
+Description
+📄 Problem Statement 
+
+Railway passengers often face difficulties in accessing accurate and timely information regarding train availability, routes, schedules, and booking status. Traditional systems are either complex, time-consuming, or not user-friendly, which leads to inconvenience for travelers. There is a need for a centralized, web-based platform that allows users to easily search trains, view details, and manage bookings in a simple and efficient manner.
+
+The existing manual and semi-digital processes lack real-time interaction, proper data organization, and smooth user experience. Therefore, an integrated system is required that can automate railway information management and provide quick access to train-related services.
+
+RailConnect aims to solve these issues by offering a user-friendly web application that enables users to search trains, view routes, and perform bookings through a single platform.
+
+📄 Project Description 
+
+RailConnect is a web-based railway management system developed using the Django framework. The main objective of this project is to provide an efficient and easy-to-use platform for passengers to search train routes, view train details, and manage bookings online.
+
+The system allows users to register and log in securely. Once authenticated, users can search for trains between source and destination stations, view train numbers, names, and routes, and book tickets. An admin panel is included to manage train data, users, and bookings.
+
+RailConnect improves the overall travel planning experience by offering centralized access to railway information with a clean interface and reliable backend system. The project demonstrates the practical implementation of web technologies, database management, and authentication mechanisms.

@@ -77,14 +77,16 @@ WSGI_APPLICATION = 'train.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import os
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "train_booking",
-        "USER": "root",
-        "PASSWORD": "root",
-        "HOST": "127.0.0.1",
-        "PORT": "3308",
+        "NAME": os.getenv("MYSQLDATABASE"),
+        "USER": os.getenv("MYSQLUSER"),
+        "PASSWORD": os.getenv("MYSQLPASSWORD"),
+        "HOST": os.getenv("MYSQLHOST"),
+        "PORT": os.getenv("MYSQLPORT", "3306"),
     }
 }
 

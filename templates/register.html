@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+.auth-wrap {
+    min-height: calc(100vh - 62px - 62px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 60px 20px;
+    background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(16,185,129,0.06) 0%, transparent 70%);
+}
+.auth-card {
+    width: 100%; max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+.auth-header { padding: 32px 36px 24px; border-bottom: 1px solid var(--border); }
+.auth-brand {
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--green); margin-bottom: 12px;
+}
+.auth-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
+.auth-sub { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
+.auth-body { padding: 28px 36px 36px; }
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-input {
+    width: 100%; padding: 12px 14px;
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 14px; outline: none;
+    transition: border-color 0.12s, box-shadow 0.12s;
+}
+.auth-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+.auth-submit {
+    width: 100%; padding: 13px;
+    background: var(--green); border: none; border-radius: 10px;
+    color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: filter 0.15s, transform 0.1s;
+    margin-top: 4px;
+}
+.auth-submit:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.auth-error {
+    padding: 11px 14px; background: var(--red-dim);
+    border: 1px solid rgba(239,68,68,0.25); border-radius: 8px;
+    font-size: 13px; color: var(--red);
+}
+.auth-footer { text-align: center; font-size: 13px; color: var(--text-sub); margin-top: 20px; }
+.auth-footer a { color: var(--rail-2); }
+.auth-footer a:hover { text-decoration: underline; }
+</style>
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-brand">RailConnect</div>
+            <div class="auth-title">Create account</div>
+            <div class="auth-sub">Join millions of smart travellers</div>
+        </div>
+        <div class="auth-body">
+            {% if error %}
+            <div class="auth-error">⚠ {{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="auth-form">
+                {% csrf_token %}
+                <input type="text" name="username" class="auth-input" placeholder="Username" required>
+                <input type="email" name="email" class="auth-input" placeholder="Email address" required>
+                <input type="password" name="password" class="auth-input" placeholder="Password" required>
+                <button type="submit" class="auth-submit">Create Account →</button>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account? <a href="{% url 'login' %}">Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

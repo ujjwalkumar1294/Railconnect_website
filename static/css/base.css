@@ -1,0 +1,166 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #1e293b;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar {
+    background: linear-gradient(90deg, #1e3a8a, #2563eb);
+    padding: 14px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+/* Left side */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+/* Logo */
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.logo span {
+    color: #60a5fa;
+}
+
+.logo:hover {
+    opacity: 0.8;
+}
+
+/* Nav links */
+.nav-link {
+    color: #e0f2fe;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    color: white;
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0%;
+    height: 2px;
+    background: white;
+    transition: 0.3s;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Right side */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* ================= USER BADGE ================= */
+
+.user-badge {
+    padding: 6px 16px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.user-badge:hover {
+    transform: translateY(-2px);
+    transition: 0.3s;
+}
+
+/* ================= BUTTONS ================= */
+
+/* Login Button */
+.login-btn {
+    padding: 6px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    border: 1px solid white;
+    color: white;
+    transition: 0.3s;
+}
+
+.login-btn:hover {
+    background: white;
+    color: #2563eb;
+}
+
+/* Register Button */
+.register-btn {
+    padding: 6px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    background: #10b981;
+    color: white;
+    transition: 0.3s;
+}
+
+.register-btn:hover {
+    background: #059669;
+}
+
+/* Logout Button */
+.logout-btn {
+    padding: 6px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    background: #ef4444;
+    color: white;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+}
+
+/* ================= MAIN CONTENT ================= */
+
+.main-content {
+    flex: 1;
+    padding: 60px 70px;
+}
+
+/* ================= FOOTER ================= */
+
+footer {
+    background: #1e3a8a;
+    color: white;
+    text-align: center;
+    padding: 16px;
+}

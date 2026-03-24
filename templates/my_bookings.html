@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+.mb-page { padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
+.mb-header { margin-bottom: 28px; }
+.mb-title {
+    font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+    margin-bottom: 4px;
+}
+.mb-sub { font-size: 14px; color: var(--text-sub); }
+
+/* booking cards */
+.bookings-grid { display: grid; gap: 16px; }
+.bk-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    transition: border-color 0.15s, transform 0.15s;
+}
+.bk-card:hover { border-color: var(--border-hi); transform: translateY(-2px); }
+.bk-card-top {
+    padding: 18px 22px;
+    display: flex; align-items: center; gap: 16px;
+    border-bottom: 1px solid var(--border);
+}
+.bk-pnr {
+    font-family: 'Syne', monospace; font-size: 13px; font-weight: 700;
+    color: var(--rail-2); background: var(--rail-dim);
+    border: 1px solid var(--border-hi); border-radius: 6px;
+    padding: 4px 10px; flex-shrink: 0;
+}
+.bk-train-info { flex: 1; }
+.bk-train-name { font-weight: 600; font-size: 15px; }
+.bk-train-num { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+.bk-status { flex-shrink: 0; }
+
+.bk-card-body {
+    padding: 16px 22px;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; border-bottom: 1px solid var(--border);
+}
+.bk-detail-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;
+}
+.bk-detail-value { font-size: 14px; font-weight: 500; }
+
+/* journey viz inline */
+.bk-journey {
+    padding: 12px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px;
+}
+.j-from { font-weight: 600; }
+.j-arrow {
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--rail) 0%, var(--rail-2) 100%);
+    position: relative; margin: 0 10px;
+}
+.j-arrow::before { content:'🚂'; position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-size:16px; }
+.j-to { font-weight: 600; }
+
+.bk-card-actions {
+    padding: 14px 22px; display: flex; gap: 10px; align-items: center;
+}
+.view-btn {
+    padding: 8px 16px; background: var(--rail);
+    border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600;
+    transition: all 0.15s;
+}
+.view-btn:hover { background: var(--rail-2); }
+.cancel-btn {
+    padding: 8px 16px; background: var(--red-dim);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 8px; color: var(--red); font-size: 13px; font-weight: 600;
+    transition: all 0.15s;
+}
+.cancel-btn:hover { background: rgba(239,68,68,0.2); }
+
+/* empty */
+.empty-state {
+    text-align: center; padding: 80px 20px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px;
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.empty-sub { font-size: 14px; color: var(--text-sub); margin-bottom: 24px; }
+
+@media (max-width: 768px) {
+    .mb-page { padding: 24px 16px; }
+    .bk-card-body { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<div class="mb-page">
+    <div class="mb-header">
+        <div class="mb-title">🎫 My Bookings</div>
+        <div class="mb-sub">All your upcoming and past journeys</div>
+    </div>
+
+    {% if bookings %}
+    <div class="bookings-grid">
+        {% for booking in bookings %}
+        <div class="bk-card">
+            <!-- TOP ROW -->
+            <div class="bk-card-top">
+                <div class="bk-pnr">{{ booking.pnr }}</div>
+                <div class="bk-train-info">
+                    <div class="bk-train-name">{{ booking.train.train_name }}</div>
+                    <div class="bk-train-num">Train # {{ booking.train.train_number }}</div>
+                </div>
+                <div class="bk-status">
+                    <span class="badge badge-green">✔ {{ booking.status }}</span>
+                </div>
+            </div>
+
+            <!-- JOURNEY -->
+            <div class="bk-journey">
+                <span class="j-from">{{ booking.from_station.name|default:"—" }}</span>
+                <div class="j-arrow"></div>
+                <span class="j-to">{{ booking.to_station.name|default:"—" }}</span>
+            </div>
+
+            <!-- DETAILS -->
+            <div class="bk-card-body">
+                <div>
+                    <div class="bk-detail-label">Travel Date</div>
+                    <div class="bk-detail-value">{{ booking.travel_date }}</div>
+                </div>
+                <div>
+                    <div class="bk-detail-label">Passengers</div>
+                    <div class="bk-detail-value">{{ booking.passengers }}</div>
+                </div>
+                <div>
+                    <div class="bk-detail-label">Total Fare</div>
+                    <div class="bk-detail-value" style="color:var(--green); font-weight:700;">₹{{ booking.total_price }}</div>
+                </div>
+                <div>
+                    <div class="bk-detail-label">Booked On</div>
+                    <div class="bk-detail-value" style="font-size:13px;">{{ booking.created_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="bk-card-actions">
+                <a href="{% url 'booking_summary' booking.id %}" class="view-btn">View Ticket</a>
+                <a href="{% url 'download_ticket' booking.id %}" class="view-btn" style="background:var(--ink-2); border:1px solid var(--border); color:var(--text-sub);">⬇ PDF</a>
+                <a href="{% url 'cancel_booking' booking.id %}"
+                   class="cancel-btn"
+                   onclick="return confirm('Cancel booking {{ booking.pnr }}? Seats will be restored.')">
+                   ✕ Cancel
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🎫</div>
+        <div class="empty-title">No bookings yet</div>
+        <div class="empty-sub">Your confirmed tickets will appear here.</div>
+        <a href="{% url 'train_list' %}" class="btn btn-primary">Browse Trains →</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

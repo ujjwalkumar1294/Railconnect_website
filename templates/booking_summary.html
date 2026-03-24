@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+.summary-page {
+    max-width: 640px; margin: 0 auto; padding: 48px 24px;
+}
+.success-banner {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--green-dim); border: 1px solid rgba(16,185,129,0.25);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 28px;
+}
+.success-icon { font-size: 28px; }
+.success-text strong { display: block; font-size: 15px; font-weight: 600; color: var(--green); }
+.success-text span { font-size: 13px; color: var(--text-sub); }
+
+.ticket-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; overflow: hidden; box-shadow: var(--shadow);
+}
+.ticket-head {
+    padding: 22px 28px;
+    background: linear-gradient(120deg, #1a3a8a 0%, #1e4bbd 50%, #2563eb 100%);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.ticket-head-title {
+    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
+    color: #fff;
+}
+.ticket-head-sub { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+.pnr-chip {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; padding: 6px 14px;
+    font-family: 'Syne', monospace; font-size: 14px; font-weight: 700;
+    color: #fff; letter-spacing: 1px;
+}
+.ticket-body { padding: 28px; }
+.ticket-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px; margin-bottom: 24px;
+}
+.tg-item { }
+.tg-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px;
+}
+.tg-value { font-size: 15px; font-weight: 500; }
+.tg-value-big {
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700;
+    color: var(--green);
+}
+
+/* journey viz */
+.journey-row {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 24px;
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 22px;
+}
+.j-station { flex: 1; }
+.j-station-name { font-size: 16px; font-weight: 600; }
+.j-station-time { font-size: 12px; color: var(--text-sub); margin-top: 3px; }
+.j-middle {
+    flex: 1; text-align: center; position: relative;
+}
+.j-line {
+    height: 2px; background: linear-gradient(90deg, var(--rail) 0%, var(--rail-2) 100%);
+    border-radius: 2px; position: relative;
+}
+.j-line::before, .j-line::after {
+    content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+    width: 8px; height: 8px; border-radius: 50%; background: var(--rail);
+}
+.j-line::before { left: -4px; }
+.j-line::after  { right: -4px; }
+.j-train-label { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+
+.divider {
+    height: 1px; background: var(--border); margin: 20px 0;
+    position: relative;
+}
+.divider::before, .divider::after {
+    content: '';
+    position: absolute; top: -10px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--ink);
+}
+.divider::before { left: -30px; }
+.divider::after  { right: -30px; }
+
+.pax-details {
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; margin-bottom: 20px;
+}
+.pax-details-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px;
+}
+.pax-detail-row {
+    font-size: 13px; color: var(--text-sub);
+    padding: 4px 0; border-bottom: 1px solid var(--border);
+}
+.pax-detail-row:last-child { border-bottom: none; }
+
+.ticket-actions {
+    padding: 20px 28px; border-top: 1px solid var(--border);
+    display: flex; gap: 12px;
+}
+.dl-btn {
+    flex: 1; padding: 13px; text-align: center;
+    background: var(--rail); border-radius: 10px;
+    color: #fff; font-size: 14px; font-weight: 600;
+    transition: all 0.15s;
+}
+.dl-btn:hover { background: var(--rail-2); transform: translateY(-1px); }
+.my-btn {
+    flex: 1; padding: 13px; text-align: center;
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text-sub);
+    font-size: 14px; font-weight: 500; transition: all 0.15s;
+}
+.my-btn:hover { color: var(--text); border-color: var(--border-hi); }
+</style>
+
+<div class="summary-page">
+    <div class="success-banner">
+        <div class="success-icon">✅</div>
+        <div class="success-text">
+            <strong>Booking Confirmed!</strong>
+            <span>Your e-ticket has been sent to your registered email address.</span>
+        </div>
+    </div>
+
+    <div class="ticket-card">
+        <div class="ticket-head">
+            <div>
+                <div class="ticket-head-title">🚆 RailConnect E-Ticket</div>
+                <div class="ticket-head-sub">{{ booking.travel_date }}</div>
+            </div>
+            <div class="pnr-chip">{{ booking.pnr }}</div>
+        </div>
+
+        <div class="ticket-body">
+            <!-- JOURNEY VISUALIZATION -->
+            <div class="journey-row">
+                <div class="j-station">
+                    <div class="j-station-name">{{ source|default:"—" }}</div>
+                    <div class="j-station-time">Dep: {{ departure|default:"—" }}</div>
+                </div>
+                <div class="j-middle">
+                    <div class="j-line"></div>
+                    <div class="j-train-label">🚂 {{ booking.train.train_name }}</div>
+                </div>
+                <div class="j-station" style="text-align:right;">
+                    <div class="j-station-name">{{ destination|default:"—" }}</div>
+                    <div class="j-station-time">Arr: {{ arrival|default:"—" }}</div>
+                </div>
+            </div>
+
+            <!-- DETAILS GRID -->
+            <div class="ticket-grid">
+                <div class="tg-item">
+                    <div class="tg-label">Train</div>
+                    <div class="tg-value">{{ booking.train.train_name }}</div>
+                </div>
+                <div class="tg-item">
+                    <div class="tg-label">Train No.</div>
+                    <div class="tg-value">{{ booking.train.train_number }}</div>
+                </div>
+                <div class="tg-item">
+                    <div class="tg-label">Travel Date</div>
+                    <div class="tg-value">{{ booking.travel_date }}</div>
+                </div>
+                <div class="tg-item">
+                    <div class="tg-label">Passengers</div>
+                    <div class="tg-value">{{ booking.passengers }}</div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- PASSENGER DETAILS -->
+            {% if booking.passenger_details %}
+            <div class="pax-details">
+                <div class="pax-details-title">Passenger Details</div>
+                {% for line in booking.passenger_details.splitlines %}
+                {% if line.strip %}
+                <div class="pax-detail-row">{{ forloop.counter }}. {{ line }}</div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- TOTAL -->
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0;">
+                <div style="font-size:14px; color:var(--text-sub);">Total Fare</div>
+                <div class="tg-value-big">₹{{ booking.total_price }}</div>
+            </div>
+        </div>
+
+        <div class="ticket-actions">
+            <a href="{% url 'download_ticket' booking.id %}" class="dl-btn">⬇ Download PDF</a>
+            <a href="{% url 'my_bookings' %}" class="my-btn">My Bookings →</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

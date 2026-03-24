@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+.bk-page {
+    max-width: 760px; margin: 0 auto;
+    padding: 48px 24px;
+}
+.bk-back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--text-sub); margin-bottom: 24px;
+    transition: color 0.15s;
+}
+.bk-back:hover { color: var(--rail-2); }
+.bk-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; overflow: hidden; box-shadow: var(--shadow);
+}
+.bk-card-header {
+    padding: 24px 28px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+}
+.bk-train-icon {
+    width: 46px; height: 46px; border-radius: 10px;
+    background: var(--rail-dim); border: 1px solid var(--border-hi);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+}
+.bk-train-name {
+    font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700;
+}
+.bk-train-num { font-size: 13px; color: var(--text-sub); margin-top: 2px; }
+.bk-seats-badge {
+    margin-left: auto; text-align: right;
+}
+.bk-body { padding: 28px; }
+.bk-error {
+    padding: 12px 16px; background: var(--red-dim);
+    border: 1px solid rgba(239,68,68,0.25); border-radius: 10px;
+    color: var(--red); font-size: 14px; margin-bottom: 20px;
+}
+.bk-form { display: grid; gap: 18px; }
+.bk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bk-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.9px;
+    text-transform: uppercase; color: var(--text-sub);
+    display: block; margin-bottom: 6px;
+}
+.bk-select, .bk-input {
+    width: 100%; padding: 11px 14px;
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 14px; outline: none;
+    transition: border-color 0.12s, box-shadow 0.12s;
+}
+.bk-select:focus, .bk-input:focus {
+    border-color: var(--rail-2); box-shadow: 0 0 0 3px rgba(59,158,255,0.1);
+}
+.bk-select option { background: var(--card); }
+
+/* price preview */
+.price-preview-card {
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 48px;
+}
+.price-preview-label { font-size: 13px; color: var(--text-sub); }
+.price-preview-value {
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700;
+    color: var(--green);
+}
+
+/* passenger boxes */
+.pax-section { display: grid; gap: 14px; }
+.pax-box {
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px;
+}
+.pax-title {
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--rail-2); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+}
+.pax-title::before {
+    content: attr(data-num);
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--rail-dim); border: 1px solid var(--border-hi);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--rail-2);
+}
+.pax-fields { display: grid; grid-template-columns: 1fr 80px 120px; gap: 10px; }
+.pax-input, .pax-select {
+    width: 100%; padding: 10px 12px;
+    background: var(--ink); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-size: 13px; outline: none;
+    transition: border-color 0.12s;
+}
+.pax-input:focus, .pax-select:focus { border-color: var(--rail-2); }
+.pax-select option { background: var(--card); }
+
+.confirm-btn {
+    width: 100%; padding: 14px;
+    background: var(--rail); border: none; border-radius: 12px;
+    color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+    margin-top: 8px;
+}
+.confirm-btn:hover { background: var(--rail-2); transform: translateY(-2px); }
+.confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+
+<div class="bk-page">
+    <a href="{% url 'train_list' %}" class="bk-back">← Back to Trains</a>
+
+    <div class="bk-card">
+        <div class="bk-card-header">
+            <div class="bk-train-icon">🚂</div>
+            <div>
+                <div class="bk-train-name">{{ train.train_name }}</div>
+                <div class="bk-train-num"># {{ train.train_number }}</div>
+            </div>
+            <div class="bk-seats-badge">
+                <span class="badge badge-green">{{ train.available_seats }} seats available</span>
+                <div style="font-size:12px; color:var(--text-sub); margin-top:4px;">₹{{ train.price }} / segment</div>
+            </div>
+        </div>
+
+        <div class="bk-body">
+            {% if error %}
+            <div class="bk-error">⚠ {{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="bk-form">
+                {% csrf_token %}
+
+                <div class="bk-row">
+                    <div>
+                        <label class="bk-label">From Station</label>
+                        <select name="from_station" id="from-station" class="bk-select" required>
+                            <option value="">Select departure station</option>
+                            {% for stop in routes %}
+                            <option value="{{ stop.station.id }}"
+                                {% if selected_from == stop.station.id|stringformat:"s" %}selected{% endif %}>
+                                {{ stop.station.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="bk-label">To Station</label>
+                        <select name="to_station" id="to-station" class="bk-select" required>
+                            <option value="">Select arrival station</option>
+                            {% for stop in routes %}
+                            <option value="{{ stop.station.id }}"
+                                {% if selected_to == stop.station.id|stringformat:"s" %}selected{% endif %}>
+                                {{ stop.station.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bk-row">
+                    <div>
+                        <label class="bk-label">Travel Date</label>
+                        <input type="date" name="travel_date" class="bk-input" required
+                               min="{% now 'Y-m-d' %}">
+                    </div>
+                    <div>
+                        <label class="bk-label">Passengers</label>
+                        <input type="number" id="passenger-count" name="passengers"
+                               class="bk-input" min="1" max="{{ train.available_seats }}"
+                               placeholder="1" required>
+                    </div>
+                </div>
+
+                <!-- PRICE PREVIEW -->
+                <div class="price-preview-card">
+                    <div class="price-preview-label" id="segment-info">Select stations to calculate fare</div>
+                    <div class="price-preview-value" id="price-preview"></div>
+                </div>
+
+                <!-- PASSENGER FIELDS (injected by JS) -->
+                <div id="passenger-fields" class="pax-section"></div>
+
+                <button type="submit" class="confirm-btn">Confirm Booking →</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const trainPrice = {{ train.price }};
+const routes = [
+    {% for stop in routes %}
+    { id: "{{ stop.station.id }}", order: {{ stop.stop_order }}, name: "{{ stop.station.name }}" },
+    {% endfor %}
+];
+
+function getSegments() {
+    const fromId = document.getElementById("from-station").value;
+    const toId   = document.getElementById("to-station").value;
+    if (!fromId || !toId) return 0;
+    const from = routes.find(r => r.id === fromId);
+    const to   = routes.find(r => r.id === toId);
+    if (!from || !to || from.order >= to.order) return 0;
+    return to.order - from.order;
+}
+
+function updatePrice() {
+    const count    = parseInt(document.getElementById("passenger-count").value) || 0;
+    const segments = getSegments();
+    const infoEl   = document.getElementById("segment-info");
+    const priceEl  = document.getElementById("price-preview");
+
+    if (segments === 0 && document.getElementById("from-station").value && document.getElementById("to-station").value) {
+        infoEl.textContent = "⚠ Invalid station selection (check direction)";
+        priceEl.textContent = "";
+        return;
+    }
+    if (segments === 0) { infoEl.textContent = "Select stations to calculate fare"; priceEl.textContent = ""; return; }
+    if (count < 1)       { infoEl.textContent = `${segments} segment(s) · Enter passengers`; priceEl.textContent = ""; return; }
+
+    const total = count * segments * trainPrice;
+    infoEl.textContent = `${segments} segment(s) × ${count} passenger(s) × ₹${trainPrice}`;
+    priceEl.textContent = "₹" + total.toLocaleString('en-IN');
+}
+
+function buildPassengerFields() {
+    const count = parseInt(document.getElementById("passenger-count").value) || 0;
+    const container = document.getElementById("passenger-fields");
+    container.innerHTML = "";
+    updatePrice();
+    if (count < 1) return;
+    for (let i = 1; i <= count; i++) {
+        const box = document.createElement("div");
+        box.className = "pax-box";
+        box.innerHTML = `
+            <div class="pax-title" data-num="${i}">Passenger ${i}</div>
+            <div class="pax-fields">
+                <input type="text"   name="name_${i}"   class="pax-input" placeholder="Full Name" required>
+                <input type="number" name="age_${i}"    class="pax-input" placeholder="Age" min="1" max="120" required>
+                <select             name="gender_${i}" class="pax-select" required>
+                    <option value="">Gender</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+            </div>`;
+        container.appendChild(box);
+    }
+}
+
+document.getElementById("from-station").addEventListener("change", updatePrice);
+document.getElementById("to-station").addEventListener("change", updatePrice);
+document.getElementById("passenger-count").addEventListener("input", buildPassengerFields);
+</script>
+
+{% endblock %}

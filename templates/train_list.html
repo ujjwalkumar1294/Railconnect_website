@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+.tl-page { padding: 40px 60px; }
+.tl-header { margin-bottom: 32px; }
+.tl-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--rail-2); margin-bottom: 8px;
+}
+.tl-title {
+    font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800;
+    margin-bottom: 4px;
+}
+.tl-sub { font-size: 14px; color: var(--text-sub); }
+
+/* search */
+.search-box {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px;
+    display: flex; gap: 12px; align-items: center;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+.search-box input {
+    flex: 1; min-width: 160px; padding: 11px 14px;
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-size: 14px; outline: none;
+    transition: border-color 0.12s;
+}
+.search-box input:focus { border-color: var(--rail-2); }
+.search-btn {
+    padding: 11px 22px; background: var(--rail); border: none;
+    border-radius: 8px; color: #fff; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+    white-space: nowrap;
+}
+.search-btn:hover { background: var(--rail-2); }
+.clear-link {
+    font-size: 13px; color: var(--text-sub);
+    padding: 11px 12px; border-radius: 8px;
+}
+.clear-link:hover { color: var(--text); }
+
+/* results bar */
+.results-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+}
+.results-count { font-size: 13px; color: var(--text-sub); }
+
+/* error */
+.search-error {
+    padding: 14px 18px;
+    background: var(--red-dim); border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 10px; color: var(--red); font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* TABLE */
+.t-wrap {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+}
+.t-header-row {
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.t-title { font-size: 14px; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+    padding: 11px 16px; font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-dim); background: var(--ink-2);
+    border-bottom: 1px solid var(--border); text-align: left;
+}
+tbody td {
+    padding: 14px 16px; font-size: 14px;
+    border-bottom: 1px solid var(--border);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--ink-2); }
+td.mono { font-family: 'Syne', monospace; font-size: 12px; color: var(--rail-2); }
+
+/* stops toggle */
+details summary {
+    cursor: pointer; font-size: 12px; font-weight: 600;
+    color: var(--rail-2); list-style: none; padding: 4px 0;
+}
+details summary::-webkit-details-marker { display: none; }
+.stops-list {
+    margin-top: 8px; padding: 10px;
+    background: var(--ink); border-radius: 8px;
+    display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+}
+.stop-chip {
+    font-size: 11px; padding: 3px 9px;
+    background: var(--rail-dim); color: var(--rail-2);
+    border-radius: 20px; border: 1px solid var(--border-hi);
+}
+.stop-arrow { color: var(--text-dim); font-size: 11px; }
+
+/* book btn */
+.book-btn {
+    display: inline-block; padding: 7px 16px;
+    background: var(--rail); color: #fff;
+    border-radius: 8px; font-size: 13px; font-weight: 600;
+    transition: all 0.15s;
+}
+.book-btn:hover { background: var(--rail-2); transform: translateY(-1px); }
+.no-route-tag {
+    font-size: 11px; color: var(--gold);
+    background: var(--gold-dim); border-radius: 6px;
+    padding: 3px 8px; display: block; margin-top: 4px;
+}
+
+/* empty */
+.empty-state {
+    text-align: center; padding: 60px 20px; color: var(--text-dim);
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+@media (max-width: 900px) {
+    .tl-page { padding: 24px 16px; }
+    table { font-size: 13px; }
+}
+</style>
+
+<div class="tl-page">
+    <div class="tl-header">
+        <div class="tl-eyebrow">Rail Network</div>
+        <div class="tl-title">Find Your Train</div>
+        <div class="tl-sub">Search across all routes or browse every available train</div>
+    </div>
+
+    <!-- SEARCH -->
+    <form method="GET" class="search-box">
+        <input type="text" name="from" placeholder="🚉 From station..." value="{{ from_query|default:'' }}">
+        <input type="text" name="to" placeholder="🏁 To station..." value="{{ to_query|default:'' }}">
+        <button type="submit" class="search-btn">Search Trains</button>
+        {% if from_query or to_query %}
+        <a href="{% url 'train_list' %}" class="clear-link">✕ Clear</a>
+        {% endif %}
+    </form>
+
+    <!-- ERROR -->
+    {% if search_error %}
+    <div class="search-error">⚠ {{ search_error }}</div>
+    {% endif %}
+
+    <!-- RESULTS BAR -->
+    <div class="results-bar">
+        <div class="results-count">
+            {% if from_query and to_query %}
+                Showing trains from <strong>{{ from_query }}</strong> → <strong>{{ to_query }}</strong>
+            {% else %}
+                All available trains
+            {% endif %}
+            &nbsp;&nbsp;<span class="badge badge-blue">{{ total_found }} found</span>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="t-wrap">
+        <div class="t-header-row">
+            <span class="t-title">🚂 Train Listing</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Train No.</th>
+                    <th>Name</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Dep.</th>
+                    <th>Arr.</th>
+                    <th>Price/Seg</th>
+                    <th>Seats</th>
+                    <th>Route</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in trains_data %}
+                <tr>
+                    <td class="mono">{{ item.train.train_number }}</td>
+                    <td>
+                        <strong>{{ item.train.train_name }}</strong>
+                        {% if item.no_route %}
+                        <span class="no-route-tag">⚠ No routes yet</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.display_from }}</td>
+                    <td>{{ item.display_to }}</td>
+                    <td style="color:var(--text-sub);">{{ item.departure|default:"—" }}</td>
+                    <td style="color:var(--text-sub);">{{ item.arrival|default:"—" }}</td>
+                    <td><span class="badge badge-amber">₹{{ item.price }}</span></td>
+                    <td>
+                        {% if item.available_seats > 0 %}
+                            <span class="badge badge-green">{{ item.available_seats }}</span>
+                        {% else %}
+                            <span class="badge badge-red">Sold Out</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.stops %}
+                        <details>
+                            <summary>▸ View Stops ({{ item.stops|length }})</summary>
+                            <div class="stops-list">
+                                {% for stop in item.stops %}
+                                    <span class="stop-chip">{{ stop.station.name }}</span>
+                                    {% if not forloop.last %}<span class="stop-arrow">›</span>{% endif %}
+                                {% endfor %}
+                            </div>
+                        </details>
+                        {% else %}
+                            <span style="color:var(--text-dim); font-size:13px;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.available_seats > 0 and not item.no_route %}
+                            <a href="{% url 'book_train' item.train.id %}" class="book-btn">Book Now</a>
+                        {% elif item.no_route %}
+                            <span style="font-size:12px; color:var(--text-dim);">Not available</span>
+                        {% else %}
+                            <span class="badge badge-red">Sold Out</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10">
+                        <div class="empty-state">
+                            <div class="empty-icon">🚂</div>
+                            <p>No trains found{% if from_query or to_query %} for this route{% endif %}.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

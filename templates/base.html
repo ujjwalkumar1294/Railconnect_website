@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailConnect — Smart Train Booking</title>
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink:       #0b0f1a;
+            --ink-2:     #1a2236;
+            --ink-3:     #243048;
+            --surface:   #111827;
+            --card:      #161d2e;
+            --border:    rgba(255,255,255,0.07);
+            --border-hi: rgba(99,179,255,0.22);
+            --rail:      #2563eb;
+            --rail-2:    #3b9eff;
+            --rail-dim:  rgba(59,158,255,0.12);
+            --gold:      #f5a623;
+            --gold-dim:  rgba(245,166,35,0.13);
+            --green:     #10b981;
+            --green-dim: rgba(16,185,129,0.12);
+            --red:       #ef4444;
+            --red-dim:   rgba(239,68,68,0.12);
+            --text:      #e2eaf8;
+            --text-sub:  #7b93b5;
+            --text-dim:  #3e5272;
+            --radius:    10px;
+            --shadow:    0 8px 32px rgba(0,0,0,0.4);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--ink);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        a { color: inherit; text-decoration: none; }
+        button, input, select { font-family: inherit; }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            position: sticky; top: 0; z-index: 900;
+            height: 62px;
+            background: rgba(11,15,26,0.88);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px;
+        }
+        .nav-left { display: flex; align-items: center; gap: 32px; }
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px; font-weight: 800;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
+        .logo span { color: var(--rail-2); }
+        .nav-link {
+            font-size: 14px; color: var(--text-sub);
+            transition: color 0.15s;
+        }
+        .nav-link:hover { color: var(--text); }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .user-badge {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 14px;
+            background: var(--rail-dim);
+            border: 1px solid var(--border-hi);
+            border-radius: 20px;
+            font-size: 13px; font-weight: 500;
+            color: var(--rail-2);
+        }
+        .user-badge::before {
+            content: '';
+            width: 7px; height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--green);
+        }
+        .nav-btn {
+            padding: 7px 18px;
+            border-radius: 8px;
+            font-size: 13px; font-weight: 500;
+            cursor: pointer; border: none;
+            transition: all 0.15s;
+        }
+        .login-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+        }
+        .login-btn:hover { border-color: var(--rail-2); color: var(--rail-2); }
+        .register-btn {
+            background: var(--rail);
+            color: #fff;
+        }
+        .register-btn:hover { background: var(--rail-2); }
+        .logout-btn {
+            background: var(--red-dim);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: var(--red);
+        }
+        .logout-btn:hover { background: rgba(239,68,68,0.2); }
+
+        /* ── MAIN ── */
+        main.main-content { flex: 1; }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 22px;
+            font-size: 12px;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── SHARED COMPONENTS ── */
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 20px; border-radius: var(--radius);
+            font-size: 14px; font-weight: 500;
+            cursor: pointer; border: none;
+            transition: all 0.15s; white-space: nowrap;
+        }
+        .btn-primary { background: var(--rail); color: #fff; }
+        .btn-primary:hover { background: var(--rail-2); transform: translateY(-1px); }
+        .btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+        .btn-danger:hover { background: rgba(239,68,68,0.22); }
+        .btn-ghost { background: var(--ink-2); color: var(--text-sub); border: 1px solid var(--border); }
+        .btn-ghost:hover { color: var(--text); }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+        }
+        .badge {
+            display: inline-flex; align-items: center;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .badge-blue   { background: var(--rail-dim);  color: var(--rail-2); }
+        .badge-green  { background: var(--green-dim); color: var(--green); }
+        .badge-amber  { background: var(--gold-dim);  color: var(--gold); }
+        .badge-red    { background: var(--red-dim);   color: var(--red); }
+
+        /* ── FORM FIELDS ── */
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        .field label {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.9px;
+            text-transform: uppercase; color: var(--text-sub);
+        }
+        .field input, .field select {
+            padding: 10px 14px;
+            background: var(--ink-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 14px; outline: none;
+            transition: border-color 0.12s, box-shadow 0.12s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: var(--rail-2);
+            box-shadow: 0 0 0 3px rgba(59,158,255,0.1);
+        }
+        .field select option { background: var(--card); }
+        .form-stack { display: grid; gap: 18px; }
+
+        /* ── ALERT ── */
+        .alert {
+            padding: 12px 16px; border-radius: var(--radius);
+            font-size: 13px; margin-bottom: 18px;
+        }
+        .alert-error { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+        .alert-success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+        .alert-warn { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(245,166,35,0.25); }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="{% url 'landing' %}" class="logo">Rail<span>Connect</span></a>
+        <a href="{% url 'landing' %}" class="nav-link">Home</a>
+        <a href="{% url 'train_list' %}" class="nav-link">Trains</a>
+        {% if request.session.username %}
+        <a href="{% url 'my_bookings' %}" class="nav-link">My Bookings</a>
+        {% endif %}
+    </div>
+    <div class="nav-right">
+        {% if request.session.username %}
+            <div class="user-badge">{{ request.session.username }}</div>
+            <a href="{% url 'logout' %}" class="nav-btn logout-btn">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="nav-btn login-btn">Login</a>
+            <a href="{% url 'register' %}" class="nav-btn register-btn">Register</a>
+        {% endif %}
+    </div>
+</nav>
+
+<main class="main-content">{% block content %}{% endblock %}</main>
+
+<footer>© 2026 RailConnect &nbsp;·&nbsp; Smart Train Reservation System</footer>
+
+</body>
+</html>

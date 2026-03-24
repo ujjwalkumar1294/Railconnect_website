@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+.ticket-page { max-width: 640px; margin: 0 auto; padding: 48px 24px; }
+.ticket-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; overflow: hidden; box-shadow: var(--shadow);
+}
+.ticket-head {
+    padding: 24px 28px;
+    background: linear-gradient(120deg, #1a3a8a 0%, #2563eb 100%);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.th-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: #fff; }
+.th-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.pnr-chip {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; padding: 6px 14px;
+    font-family: 'Syne', monospace; font-size: 15px; font-weight: 700;
+    color: #fff; letter-spacing: 1px;
+}
+.ticket-body { padding: 28px; }
+.ticket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 22px; }
+.tg-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px; }
+.tg-value { font-size: 15px; font-weight: 500; }
+
+.journey-strip {
+    background: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 22px;
+}
+.js-station { flex: 1; }
+.js-name { font-size: 16px; font-weight: 600; }
+.js-label { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.js-line {
+    flex: 1; height: 2px;
+    background: linear-gradient(90deg, var(--rail), var(--rail-2));
+    border-radius: 2px; position: relative; margin: 0 8px;
+}
+.js-line::after {
+    content: '→'; position: absolute; top: -10px; left: 50%;
+    transform: translateX(-50%); font-size: 16px; color: var(--rail-2);
+}
+
+.fare-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0; border-top: 1px solid var(--border);
+}
+.fare-label { font-size: 14px; color: var(--text-sub); }
+.fare-value {
+    font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; color: var(--green);
+}
+
+.ticket-footer {
+    padding: 16px 28px;
+    background: var(--ink-2); border-top: 1px solid var(--border);
+    text-align: center; font-size: 14px; color: var(--text-sub);
+}
+.ticket-actions {
+    padding: 20px 28px; border-top: 1px solid var(--border);
+    display: flex; gap: 12px;
+}
+.dl-btn {
+    flex: 1; padding: 12px; text-align: center;
+    background: var(--rail); border-radius: 10px;
+    color: #fff; font-size: 14px; font-weight: 600;
+    transition: all 0.15s;
+}
+.dl-btn:hover { background: var(--rail-2); }
+.back-btn {
+    padding: 12px 20px; background: var(--ink-2);
+    border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text-sub); font-size: 14px; transition: all 0.15s;
+}
+.back-btn:hover { color: var(--text); }
+</style>
+
+<div class="ticket-page">
+    <div class="ticket-card">
+        <div class="ticket-head">
+            <div>
+                <div class="th-title">🎫 RailConnect E-Ticket</div>
+                <div class="th-sub">{{ booking.travel_date }}</div>
+            </div>
+            <div class="pnr-chip">{{ booking.pnr }}</div>
+        </div>
+
+        <div class="ticket-body">
+            <!-- JOURNEY STRIP -->
+            <div class="journey-strip">
+                <div class="js-station">
+                    <div class="js-name">{{ booking.from_station.name|default:"—" }}</div>
+                    <div class="js-label">Departure</div>
+                </div>
+                <div class="js-line"></div>
+                <div class="js-station" style="text-align:right;">
+                    <div class="js-name">{{ booking.to_station.name|default:"—" }}</div>
+                    <div class="js-label">Arrival</div>
+                </div>
+            </div>
+
+            <!-- DETAILS GRID -->
+            <div class="ticket-grid">
+                <div>
+                    <div class="tg-label">Train Name</div>
+                    <div class="tg-value">{{ booking.train.train_name }}</div>
+                </div>
+                <div>
+                    <div class="tg-label">Train Number</div>
+                    <div class="tg-value">{{ booking.train.train_number }}</div>
+                </div>
+                <div>
+                    <div class="tg-label">Travel Date</div>
+                    <div class="tg-value">{{ booking.travel_date }}</div>
+                </div>
+                <div>
+                    <div class="tg-label">Passengers</div>
+                    <div class="tg-value">{{ booking.passengers }}</div>
+                </div>
+            </div>
+
+            <!-- PASSENGER DETAILS -->
+            {% if booking.passenger_details %}
+            <div style="background:var(--ink-2); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin-bottom:16px;">
+                <div style="font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;">Passenger Details</div>
+                {% for line in booking.passenger_details.splitlines %}
+                {% if line.strip %}
+                <div style="font-size:13px; color:var(--text-sub); padding:4px 0; border-bottom:1px solid var(--border);">{{ forloop.counter }}. {{ line }}</div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="fare-row">
+                <div class="fare-label">Total Fare</div>
+                <div class="fare-value">₹{{ booking.total_price }}</div>
+            </div>
+        </div>
+
+        <div class="ticket-footer">Have a safe and pleasant journey 🚆</div>
+
+        <div class="ticket-actions">
+            <a href="{% url 'download_ticket' booking.id %}" class="dl-btn">⬇ Download PDF Ticket</a>
+            <a href="{% url 'my_bookings' %}" class="back-btn">← My Bookings</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

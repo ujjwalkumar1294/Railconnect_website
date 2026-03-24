@@ -1,0 +1,122 @@
+/* Background */
+body {
+    background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Page Wrapper */
+.page-container {
+    padding: 40px;
+}
+
+/* Titles */
+.page-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #1e293b;
+}
+
+.sub-title {
+    margin: 40px 0 20px;
+    color: #1e293b;
+}
+
+/* Search Card */
+.search-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Search Form */
+.search-form {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.search-form input,
+.search-form select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    min-width: 150px;
+}
+
+/* Buttons */
+.main-btn {
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.main-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Table Wrapper */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+/* Table */
+.train-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+/* Table Header */
+.train-table thead {
+    background: linear-gradient(90deg, #2563eb, #1e40af);
+    color: white;
+}
+
+.train-table th,
+.train-table td {
+    padding: 12px;
+    text-align: center;
+}
+
+/* Row Styling */
+.train-table tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+    transition: 0.2s;
+}
+
+.train-table tbody tr:hover {
+    background: #f1f5f9;
+}
+
+/* Book Button */
+.book-btn {
+    background: #2563eb;
+    padding: 6px 14px;
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.book-btn:hover {
+    background: #1e40af;
+}
+
+/* Sold Out */
+.sold-out {
+    color: red;
+    font-weight: 600;
+}

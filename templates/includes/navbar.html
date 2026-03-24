@@ -1,0 +1,17 @@
+<div class="navbar">
+    <div class="logo">
+        <a href="/">RailConnect 🚆</a>
+    </div>
+
+    <div class="nav-links">
+        {% if request.session.username %}
+            <span style="margin-right: 15px;">
+                Welcome {{ request.session.username }}
+            </span>
+            <a href="{% url 'logout' %}" class="register-btn">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="login-btn">Login</a>
+            <a href="{% url 'register' %}" class="register-btn">Register</a>
+        {% endif %}
+    </div>
+</div>

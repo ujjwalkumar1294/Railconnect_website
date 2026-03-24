@@ -1,0 +1,92 @@
+{% extends "adminpanel/admin_base.html" %}
+{% block page_title %}Stations{% endblock %}
+{% block n_stations %}active{% endblock %}
+{% block topbar_title %}Station Management{% endblock %}
+{% block topbar_badge %}<span class="topbar-pill">Operations</span>{% endblock %}
+
+{% block content %}
+
+<div class="ph">
+    <div class="ph-title">🏛️ Station Management</div>
+    <div class="ph-sub">Add and view all railway stations</div>
+</div>
+
+<div class="two-col">
+
+    <!-- ADD STATION FORM -->
+    <div class="t-wrap">
+        <div class="t-header">
+            <span class="t-header-title">➕ Add New Station</span>
+        </div>
+        <div style="padding: 24px;">
+            <form method="POST" action="{% url 'adminpanel:station_create' %}" class="form-stack">
+                {% csrf_token %}
+
+                <div class="field">
+                    <label>Station Code</label>
+                    <input type="text" name="code" placeholder="e.g. NDLS" maxlength="10" required style="text-transform:uppercase;">
+                </div>
+
+                <div class="field">
+                    <label>Station Name</label>
+                    <input type="text" name="name" placeholder="e.g. New Delhi" required>
+                </div>
+
+                <button type="submit" class="btn btn-success" style="margin-top:8px; width:100%;">Add Station</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- STATION LIST -->
+    <div>
+        <!-- SEARCH -->
+        <form method="get" class="search-row">
+            <input type="text" name="q" class="search-inp" placeholder="Search stations..." value="{{ query }}">
+            <button type="submit" class="search-btn">Search</button>
+            {% if query %}<a href="{% url 'adminpanel:station_list' %}" class="btn btn-ghost">Clear</a>{% endif %}
+        </form>
+
+        <div class="t-wrap">
+            <div class="t-header">
+                <span class="t-header-title">All Stations</span>
+                <span style="font-size:12px; color:var(--c-text-dim);">{{ stations|length }} station(s)</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for station in stations %}
+                    <tr>
+                        <td class="mono-cell">{{ station.code }}</td>
+                        <td><strong>{{ station.name }}</strong></td>
+                        <td>
+                            <a href="{% url 'adminpanel:station_delete' station.pk %}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete station {{ station.name }}?')">
+                                🗑 Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty">
+                                <div class="empty-icon">🏛️</div>
+                                <p>No stations found.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

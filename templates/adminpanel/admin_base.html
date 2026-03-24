@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailAdmin — {% block page_title %}Panel{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════
+           TOKENS
+        ═══════════════════════════════ */
+        :root {
+            --c-bg:        #05080f;
+            --c-surface:   #0a0e1a;
+            --c-raised:    #0f1525;
+            --c-card:      #111b2e;
+            --c-hover:     #162035;
+            --c-border:    rgba(255,255,255,0.06);
+            --c-border-hi: rgba(99,179,255,0.25);
+
+            --c-blue:      #3b9eff;
+            --c-blue-dim:  rgba(59,158,255,0.12);
+            --c-blue-glow: rgba(59,158,255,0.07);
+
+            --c-green:     #22d3a5;
+            --c-green-dim: rgba(34,211,165,0.12);
+            --c-amber:     #f5a623;
+            --c-amber-dim: rgba(245,166,35,0.12);
+            --c-red:       #f05252;
+            --c-red-dim:   rgba(240,82,82,0.12);
+
+            --c-text:      #dce8f8;
+            --c-text-sub:  #7b93b5;
+            --c-text-dim:  #3e5272;
+
+            --sidebar-w: 230px;
+            --topbar-h:  58px;
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+
+            --shadow-card: 0 2px 20px rgba(0,0,0,0.45);
+        }
+
+        /* ═══════════════════════════════
+           RESET & BASE
+        ═══════════════════════════════ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--c-bg);
+            color: var(--c-text);
+            min-height: 100vh;
+            display: flex;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        button, input, select, textarea { font-family: inherit; }
+
+        /* ═══════════════════════════════
+           SIDEBAR
+        ═══════════════════════════════ */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--c-surface);
+            border-right: 1px solid var(--c-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        /* subtle vertical scan line */
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--c-blue) 50%, transparent);
+            opacity: 0.15;
+        }
+
+        .sidebar-brand {
+            padding: 18px 20px 16px;
+            border-bottom: 1px solid var(--c-border);
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .brand-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #1a4aff 0%, #0097ff 100%);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(26,74,255,0.35);
+        }
+
+        .brand-name {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13.5px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-name em {
+            font-style: normal;
+            color: var(--c-blue);
+        }
+
+        .brand-sub {
+            font-size: 9.5px;
+            color: var(--c-text-dim);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+
+        /* nav groups */
+        .nav-group {
+            padding: 20px 10px 4px;
+        }
+
+        .nav-group-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--c-text-dim);
+            padding: 0 10px;
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 10px;
+            border-radius: var(--radius-sm);
+            color: var(--c-text-sub);
+            font-size: 13.5px;
+            font-weight: 400;
+            transition: background 0.12s, color 0.12s;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin-bottom: 1px;
+        }
+
+        .nav-link:hover {
+            background: var(--c-hover);
+            color: var(--c-text);
+        }
+
+        .nav-link.active {
+            background: var(--c-blue-dim);
+            color: var(--c-blue);
+            border-color: var(--c-border-hi);
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 14px 20px;
+            border-top: 1px solid var(--c-border);
+        }
+
+        .online-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--c-text-sub);
+        }
+
+        .online-dot {
+            width: 7px; height: 7px;
+            background: var(--c-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--c-green);
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════
+           MAIN AREA
+        ═══════════════════════════════ */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* topbar */
+        .topbar {
+            height: var(--topbar-h);
+            background: var(--c-surface);
+            border-bottom: 1px solid var(--c-border);
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--c-text);
+        }
+
+        .topbar-pill {
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            background: var(--c-blue-dim);
+            color: var(--c-blue);
+            border: 1px solid var(--c-border-hi);
+            text-transform: uppercase;
+        }
+
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-tag {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 12px;
+            background: var(--c-raised);
+            border: 1px solid var(--c-border);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--c-text-sub);
+        }
+
+        /* page body */
+        .page-body {
+            padding: 28px 32px;
+            flex: 1;
+        }
+
+        /* ═══════════════════════════════
+           PAGE HEADER
+        ═══════════════════════════════ */
+        .ph {
+            margin-bottom: 24px;
+        }
+
+        .ph-title {
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ph-sub {
+            margin-top: 3px;
+            font-size: 13px;
+            color: var(--c-text-sub);
+            font-weight: 300;
+        }
+
+        /* ═══════════════════════════════
+           STAT CARDS
+        ═══════════════════════════════ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .sc {
+            background: var(--c-card);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sc::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--c-blue);
+        }
+        .sc.green::before  { background: var(--c-green); }
+        .sc.amber::before  { background: var(--c-amber); }
+        .sc.red::before    { background: var(--c-red); }
+
+        .sc-label {
+            font-size: 9.5px;
+            font-weight: 600;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--c-text-dim);
+            margin-bottom: 9px;
+        }
+
+        .sc-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--c-text);
+            line-height: 1;
+        }
+
+        /* ═══════════════════════════════
+           TABLE COMPONENT
+        ═══════════════════════════════ */
+        .t-wrap {
+            background: var(--c-card);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .t-header {
+            padding: 13px 20px;
+            border-bottom: 1px solid var(--c-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .t-header-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 10px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--c-text-dim);
+            background: var(--c-raised);
+            border-bottom: 1px solid var(--c-border);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            font-size: 13.5px;
+            border-bottom: 1px solid var(--c-border);
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: var(--c-hover); }
+
+        td.mono-cell {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11.5px;
+            color: var(--c-blue);
+        }
+
+        td.dim-cell { color: var(--c-text-sub); font-size: 13px; }
+
+        /* ═══════════════════════════════
+           BADGES
+        ═══════════════════════════════ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .badge-green { background: var(--c-green-dim); color: var(--c-green); }
+        .badge-blue  { background: var(--c-blue-dim);  color: var(--c-blue); }
+        .badge-amber { background: var(--c-amber-dim); color: var(--c-amber); }
+        .badge-red   { background: var(--c-red-dim);   color: var(--c-red); }
+
+        /* ═══════════════════════════════
+           BUTTONS
+        ═══════════════════════════════ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 15px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.12s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--c-blue);
+            color: #fff;
+            border-color: var(--c-blue);
+        }
+        .btn-primary:hover { background: #2a8df5; }
+
+        .btn-success {
+            background: linear-gradient(135deg, #0caf83 0%, #22d3a5 100%);
+            color: #fff;
+        }
+        .btn-success:hover { filter: brightness(1.1); }
+
+        .btn-ghost {
+            background: var(--c-raised);
+            color: var(--c-text-sub);
+            border-color: var(--c-border);
+        }
+        .btn-ghost:hover { color: var(--c-text); border-color: rgba(255,255,255,0.15); }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--c-red);
+            border-color: rgba(240,82,82,0.3);
+        }
+        .btn-danger:hover { background: var(--c-red-dim); }
+
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+        /* ═══════════════════════════════
+           FORMS
+        ═══════════════════════════════ */
+        .form-stack { display: grid; gap: 16px; }
+
+        .field label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--c-text-sub);
+            margin-bottom: 6px;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            padding: 10px 13px;
+            background: var(--c-bg);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-sm);
+            color: var(--c-text);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.12s, box-shadow 0.12s;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--c-blue);
+            box-shadow: 0 0 0 3px var(--c-blue-glow);
+        }
+
+        .field select option { background: var(--c-card); }
+
+        /* ═══════════════════════════════
+           SEARCH BAR
+        ═══════════════════════════════ */
+        .search-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .search-inp {
+            flex: 1;
+            padding: 9px 14px;
+            background: var(--c-card);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-sm);
+            color: var(--c-text);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .search-inp:focus { border-color: var(--c-blue); }
+
+        .search-btn {
+            padding: 9px 18px;
+            background: var(--c-blue);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .search-btn:hover { background: #2a8df5; }
+
+        /* ═══════════════════════════════
+           EMPTY STATE
+        ═══════════════════════════════ */
+        .empty {
+            text-align: center;
+            padding: 52px 20px;
+            color: var(--c-text-dim);
+        }
+
+        .empty-icon { font-size: 36px; margin-bottom: 10px; }
+        .empty p { font-size: 13px; }
+
+        /* ═══════════════════════════════
+           ALERTS
+        ═══════════════════════════════ */
+        .alert {
+            padding: 11px 15px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .alert-error   { background: var(--c-red-dim);   color: var(--c-red);   border: 1px solid rgba(240,82,82,0.25); }
+        .alert-success { background: var(--c-green-dim); color: var(--c-green); border: 1px solid rgba(34,211,165,0.25); }
+
+        /* ═══════════════════════════════
+           UTILITY
+        ═══════════════════════════════ */
+        .flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .flex-row { display: flex; align-items: center; gap: 8px; }
+        .mb-18 { margin-bottom: 18px; }
+        .mb-24 { margin-bottom: 24px; }
+        .two-col { display: grid; grid-template-columns: 340px 1fr; gap: 22px; align-items: start; }
+    </style>
+    {% block extra_style %}{% endblock %}
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">🚆</div>
+        <div>
+            <div class="brand-name">Rail<em>Admin</em></div>
+            <div class="brand-sub">Control Panel</div>
+        </div>
+    </div>
+
+    <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <a href="{% url 'adminpanel:dashboard' %}" class="nav-link {% block n_dash %}{% endblock %}">
+            <span class="nav-icon">📊</span> Dashboard
+        </a>
+    </div>
+
+    <div class="nav-group">
+        <div class="nav-group-label">Operations</div>
+        <a href="{% url 'adminpanel:train_list' %}" class="nav-link {% block n_trains %}{% endblock %}">
+            <span class="nav-icon">🚂</span> Trains
+        </a>
+        <a href="{% url 'adminpanel:station_list' %}" class="nav-link {% block n_stations %}{% endblock %}">
+            <span class="nav-icon">🏛️</span> Stations
+        </a>
+        <a href="{% url 'adminpanel:booking_list' %}" class="nav-link {% block n_bookings %}{% endblock %}">
+            <span class="nav-icon">🎫</span> Bookings
+        </a>
+        <a href="{% url 'adminpanel:user_list' %}" class="nav-link {% block n_users %}{% endblock %}">
+            <span class="nav-icon">👥</span> Users
+        </a>
+    </div>
+
+    <div class="nav-group">
+        <div class="nav-group-label">Insights</div>
+        <a href="{% url 'adminpanel:reports' %}" class="nav-link {% block n_reports %}{% endblock %}">
+            <span class="nav-icon">📈</span> Reports
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="online-badge">
+            <div class="online-dot"></div>
+            System Online
+        </div>
+    </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+    <header class="topbar">
+        <span class="topbar-title">{% block topbar_title %}Admin{% endblock %}</span>
+        {% block topbar_badge %}{% endblock %}
+        <div class="topbar-right">
+            <div class="admin-tag">
+                <div class="online-dot"></div>
+                Administrator
+            </div>
+        </div>
+    </header>
+
+    <div class="page-body">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+</body>
+</html>

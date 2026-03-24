@@ -1,0 +1,58 @@
+{% extends "adminpanel/admin_base.html" %}
+{% block page_title %}Add Train{% endblock %}
+{% block n_trains %}active{% endblock %}
+{% block topbar_title %}Add New Train{% endblock %}
+{% block topbar_badge %}<span class="topbar-pill">Operations</span>{% endblock %}
+
+{% block content %}
+
+<div class="ph">
+    <div class="ph-title">🚂 Add New Train</div>
+    <div class="ph-sub">Register a new train to the network</div>
+</div>
+
+<div style="max-width: 480px;">
+    <div class="t-wrap">
+        <div class="t-header">
+            <span class="t-header-title">Train Details</span>
+        </div>
+        <div style="padding: 24px;">
+
+            {% if error %}
+            <div class="alert alert-error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="form-stack">
+                {% csrf_token %}
+
+                <div class="field">
+                    <label>Train Number</label>
+                    <input type="text" name="train_number" placeholder="e.g. 12345" required>
+                </div>
+
+                <div class="field">
+                    <label>Train Name</label>
+                    <input type="text" name="train_name" placeholder="e.g. Rajdhani Express" required>
+                </div>
+
+                <div class="field">
+                    <label>Total Seats</label>
+                    <input type="number" name="total_seats" min="1" placeholder="e.g. 200" required>
+                </div>
+
+                <div class="field">
+                    <label>Price per Seat (₹)</label>
+                    <input type="number" name="price" step="0.01" min="0" placeholder="e.g. 500" required>
+                </div>
+
+                <div class="flex-row" style="margin-top:8px;">
+                    <button type="submit" class="btn btn-success">✔ Save Train</button>
+                    <a href="{% url 'adminpanel:train_list' %}" class="btn btn-ghost">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

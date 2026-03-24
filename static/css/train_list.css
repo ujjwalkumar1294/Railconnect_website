@@ -1,0 +1,29 @@
+.search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.search-form input,
+.search-form select {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+.book-btn {
+    background: #22c55e;
+    padding: 6px 14px;
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+}
+
+.book-btn:hover {
+    background: #16a34a;
+}
+
+.sold-out {
+    color: #ef4444;
+    font-weight: bold;
+}
